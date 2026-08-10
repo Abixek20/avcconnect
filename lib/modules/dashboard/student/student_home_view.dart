@@ -7,7 +7,9 @@ import '../../timetable/views/timetable_view.dart';
 import '../../notices/views/notices_view.dart';
 import '../../fee_hostel/views/fee_hostel_view.dart';
 import '../../complaints/views/my_complaints_view.dart';
+import '../../fees/views/fee_view.dart';
 import '../../counselling/views/counselling_record_view.dart';
+import '../../complaints/views/complaint_view.dart';
 
 class StudentHomeView extends StatelessWidget {
   const StudentHomeView({super.key});
@@ -48,7 +50,7 @@ class StudentHomeView extends StatelessWidget {
             DashboardTile(
               icon: Icons.currency_rupee,
               label: 'Fee & Hostel',
-              onTap: () => Get.to(() => const FeeHostelView()),
+              onTap: () => Get.to(() => const FeeView()),
             ),
             DashboardTile(
   icon: Icons.badge_outlined,
@@ -64,7 +66,7 @@ class StudentHomeView extends StatelessWidget {
             DashboardTile(
               icon: Icons.report_problem_outlined,
               label: 'Complaints',
-              onTap: () => Get.to(() => const MyComplaintsView()),
+              onTap: () => Get.to(() => const ComplaintView()),
             ),
           ],
         ),

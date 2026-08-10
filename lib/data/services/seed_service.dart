@@ -7,6 +7,14 @@ import '../models/department_model.dart';
 import '../models/class_slot_model.dart';
 import '../models/notice_model.dart';
 import 'database_service.dart';
+import '../models/fee_model.dart';
+import '../models/counselling_record_model.dart';
+import '../models/parent_guardian_model.dart';
+import '../models/semester_record_model.dart';
+import '../models/subject_grade_model.dart';
+import '../models/placement_training_model.dart';
+import '../models/co_curricular_model.dart';
+import '../models/advisor_meeting_log_model.dart';
 
 /// Seeds the local Isar DB with realistic mock data modeled on
 /// A.V.C. College of Engineering, Mannampandal, Mayiladuthurai.
@@ -153,6 +161,113 @@ class SeedService {
           ..postedAt = DateTime.now().subtract(const Duration(days: 1)),
       ];
       await isar.noticeModels.putAll(notices);
+
+      // --- Fee records (one per student, mixed statuses) ---
+      final allStudents = await isar.studentModels.where().findAll();
+      final feeStatuses = [FeeStatus.paid, FeeStatus.due, FeeStatus.overdue];
+      var i = 0;
+      for (final student in allStudents) {
+        final fee = FeeModel()
+          ..studentProfileId = student.id
+          ..term = 'Semester ${student.yearOfStudy * 2}'
+          ..amount = 45000
+          ..dueDate = DateTime.now().add(const Duration(days: 15))
+          ..status = feeStatuses[i % feeStatuses.length];
+        await isar.feeModels.put(fee);
+        i++;
+      }
+
+      // --- Counselling record for one CSE student (Arun Prakash) as a full example ---
+      final arun = allStudents.firstWhere((s) => s.rollNumber == 'AU24CSE014');
+      final cseFacultyId = facultyProfileIds['CSE'];
+
+      if (cseFacultyId != null) {
+        final record = CounsellingRecordModel()
+          ..studentProfileId = arun.id
+          ..facultyAdvisorId = cseFacultyId
+          ..bloodGroup = 'B+'
+          ..category = 'General'
+          ..permanentAddress = '12, Kovil Street, Mayiladuthurai, Tamil Nadu'
+          ..emergencyContactName = 'Prakash Raman'
+          ..emergencyContactPhone = '9876543210'
+          ..transportMode = TransportMode.collegeBus
+          ..busRouteNumber = 'Route 7'
+          ..tenthPercentage = 91.4
+          ..twelfthPercentage = 88.2
+          ..scholarshipDetails = 'Tamil Nadu First Graduate Scholarship';
+        await isar.counsellingRecordModels.put(record);
+
+        await isar.parentGuardianModels.putAll([
+          ParentGuardianModel()
+            ..studentProfileId = arun.id
+            ..relation = GuardianRelation.father
+            ..name = 'Prakash Raman'
+            ..occupation = 'Farmer'
+            ..phone = '9876543210',
+          ParentGuardianModel()
+            ..studentProfileId = arun.id
+            ..relation = GuardianRelation.mother
+            ..name = 'Kalaivani Prakash'
+            ..occupation = 'Homemaker'
+            ..phone = '9876543211',
+        ]);
+
+        final sem1 = SemesterRecordModel()
+          ..studentProfileId = arun.id
+          ..semesterNumber = 1
+          ..sgpa = 8.4
+          ..attendancePercent = 92
+          ..arrearCount = 0;
+        final sem1Id = await isar.semesterRecordModels.put(sem1);
+
+        await isar.subjectGradeModels.putAll([
+          SubjectGradeModel()
+            ..semesterRecordId = sem1Id
+            ..subjectName = 'Programming in C'
+            ..subjectCode = 'CS8151'
+            ..ciaMarks = 45
+            ..semesterExamMarks = 82
+            ..grade = 'A'
+            ..gradePoint = 8.0,
+          SubjectGradeModel()
+            ..semesterRecordId = sem1Id
+            ..subjectName = 'Engineering Mathematics I'
+            ..subjectCode = 'MA8151'
+            ..ciaMarks = 42
+            ..semesterExamMarks = 78
+            ..grade = 'B+'
+            ..gradePoint = 7.5,
+        ]);
+
+        await isar.placementTrainingModels.put(
+          PlacementTrainingModel()
+            ..studentProfileId = arun.id
+            ..title = 'Aptitude & Reasoning Bootcamp'
+            ..provider = 'AVC Training & Placement Cell'
+            ..isInCollege = true
+            ..startDate = DateTime.now().subtract(const Duration(days: 60))
+            ..description = '5-day intensive covering quantitative aptitude and logical reasoning.',
+        );
+
+        await isar.coCurricularModels.put(
+          CoCurricularModel()
+            ..studentProfileId = arun.id
+            ..category = ActivityCategory.technical
+            ..level = ActivityLevel.district
+            ..title = 'Inter-College Hackathon'
+            ..achievement = 'Runner-up'
+            ..eventDate = DateTime.now().subtract(const Duration(days: 120)),
+        );
+
+        await isar.advisorMeetingLogModels.put(
+          AdvisorMeetingLogModel()
+            ..studentProfileId = arun.id
+            ..facultyId = cseFacultyId
+            ..date = DateTime.now().subtract(const Duration(days: 10))
+            ..notes = 'Discussed semester 1 performance. Advised to focus more on Mathematics.'
+            ..followUpNeeded = false,
+        );
+      }
     });
   }
 }
