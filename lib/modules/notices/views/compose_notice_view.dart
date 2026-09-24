@@ -37,6 +37,17 @@ class _ComposeNoticeViewState extends State<ComposeNoticeView> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          Obx(() => DropdownButtonFormField<String>(
+                value: controller.category.value,
+                decoration: const InputDecoration(labelText: 'Notice Category'),
+                items: ComposeNoticeController.categories.map(
+                  (c) => DropdownMenuItem(value: c, child: Text(c)),
+                ).toList(),
+                onChanged: (v) {
+                  if (v != null) controller.category.value = v;
+                },
+              )),
+          const SizedBox(height: 14),
           TextField(
             controller: _titleCtrl,
             decoration: const InputDecoration(labelText: 'Title'),
@@ -44,7 +55,7 @@ class _ComposeNoticeViewState extends State<ComposeNoticeView> {
           const SizedBox(height: 14),
           TextField(
             controller: _bodyCtrl,
-            maxLines: 6,
+            maxLines: 5,
             decoration: const InputDecoration(
               labelText: 'Notice body',
               alignLabelWithHint: true,

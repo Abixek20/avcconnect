@@ -33,23 +33,28 @@ const ComplaintModelSchema = CollectionSchema(
       name: r'description',
       type: IsarType.string,
     ),
-    r'raisedByUserId': PropertySchema(
+    r'photoPath': PropertySchema(
       id: 3,
+      name: r'photoPath',
+      type: IsarType.string,
+    ),
+    r'raisedByUserId': PropertySchema(
+      id: 4,
       name: r'raisedByUserId',
       type: IsarType.long,
     ),
     r'resolvedAt': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'resolvedAt',
       type: IsarType.dateTime,
     ),
     r'resolvedByUserId': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'resolvedByUserId',
       type: IsarType.long,
     ),
     r'status': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'status',
       type: IsarType.byte,
       enumMap: _ComplaintModelstatusEnumValueMap,
@@ -76,6 +81,12 @@ int _complaintModelEstimateSize(
 ) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.description.length * 3;
+  {
+    final value = object.photoPath;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   return bytesCount;
 }
 
@@ -88,10 +99,11 @@ void _complaintModelSerialize(
   writer.writeByte(offsets[0], object.category.index);
   writer.writeDateTime(offsets[1], object.createdAt);
   writer.writeString(offsets[2], object.description);
-  writer.writeLong(offsets[3], object.raisedByUserId);
-  writer.writeDateTime(offsets[4], object.resolvedAt);
-  writer.writeLong(offsets[5], object.resolvedByUserId);
-  writer.writeByte(offsets[6], object.status.index);
+  writer.writeString(offsets[3], object.photoPath);
+  writer.writeLong(offsets[4], object.raisedByUserId);
+  writer.writeDateTime(offsets[5], object.resolvedAt);
+  writer.writeLong(offsets[6], object.resolvedByUserId);
+  writer.writeByte(offsets[7], object.status.index);
 }
 
 ComplaintModel _complaintModelDeserialize(
@@ -107,11 +119,12 @@ ComplaintModel _complaintModelDeserialize(
   object.createdAt = reader.readDateTime(offsets[1]);
   object.description = reader.readString(offsets[2]);
   object.id = id;
-  object.raisedByUserId = reader.readLong(offsets[3]);
-  object.resolvedAt = reader.readDateTimeOrNull(offsets[4]);
-  object.resolvedByUserId = reader.readLongOrNull(offsets[5]);
+  object.photoPath = reader.readStringOrNull(offsets[3]);
+  object.raisedByUserId = reader.readLong(offsets[4]);
+  object.resolvedAt = reader.readDateTimeOrNull(offsets[5]);
+  object.resolvedByUserId = reader.readLongOrNull(offsets[6]);
   object.status =
-      _ComplaintModelstatusValueEnumMap[reader.readByteOrNull(offsets[6])] ??
+      _ComplaintModelstatusValueEnumMap[reader.readByteOrNull(offsets[7])] ??
           ComplaintStatus.open;
   return object;
 }
@@ -132,12 +145,14 @@ P _complaintModelDeserializeProp<P>(
     case 2:
       return (reader.readString(offset)) as P;
     case 3:
-      return (reader.readLong(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 4:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 5:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 6:
+      return (reader.readLongOrNull(offset)) as P;
+    case 7:
       return (_ComplaintModelstatusValueEnumMap[
               reader.readByteOrNull(offset)] ??
           ComplaintStatus.open) as P;
@@ -571,6 +586,160 @@ extension ComplaintModelQueryFilter
   }
 
   QueryBuilder<ComplaintModel, ComplaintModel, QAfterFilterCondition>
+      photoPathIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'photoPath',
+      ));
+    });
+  }
+
+  QueryBuilder<ComplaintModel, ComplaintModel, QAfterFilterCondition>
+      photoPathIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'photoPath',
+      ));
+    });
+  }
+
+  QueryBuilder<ComplaintModel, ComplaintModel, QAfterFilterCondition>
+      photoPathEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'photoPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ComplaintModel, ComplaintModel, QAfterFilterCondition>
+      photoPathGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'photoPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ComplaintModel, ComplaintModel, QAfterFilterCondition>
+      photoPathLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'photoPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ComplaintModel, ComplaintModel, QAfterFilterCondition>
+      photoPathBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'photoPath',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ComplaintModel, ComplaintModel, QAfterFilterCondition>
+      photoPathStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'photoPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ComplaintModel, ComplaintModel, QAfterFilterCondition>
+      photoPathEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'photoPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ComplaintModel, ComplaintModel, QAfterFilterCondition>
+      photoPathContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'photoPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ComplaintModel, ComplaintModel, QAfterFilterCondition>
+      photoPathMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'photoPath',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ComplaintModel, ComplaintModel, QAfterFilterCondition>
+      photoPathIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'photoPath',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<ComplaintModel, ComplaintModel, QAfterFilterCondition>
+      photoPathIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'photoPath',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<ComplaintModel, ComplaintModel, QAfterFilterCondition>
       raisedByUserIdEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -879,6 +1048,19 @@ extension ComplaintModelQuerySortBy
     });
   }
 
+  QueryBuilder<ComplaintModel, ComplaintModel, QAfterSortBy> sortByPhotoPath() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'photoPath', Sort.asc);
+    });
+  }
+
+  QueryBuilder<ComplaintModel, ComplaintModel, QAfterSortBy>
+      sortByPhotoPathDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'photoPath', Sort.desc);
+    });
+  }
+
   QueryBuilder<ComplaintModel, ComplaintModel, QAfterSortBy>
       sortByRaisedByUserId() {
     return QueryBuilder.apply(this, (query) {
@@ -989,6 +1171,19 @@ extension ComplaintModelQuerySortThenBy
     });
   }
 
+  QueryBuilder<ComplaintModel, ComplaintModel, QAfterSortBy> thenByPhotoPath() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'photoPath', Sort.asc);
+    });
+  }
+
+  QueryBuilder<ComplaintModel, ComplaintModel, QAfterSortBy>
+      thenByPhotoPathDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'photoPath', Sort.desc);
+    });
+  }
+
   QueryBuilder<ComplaintModel, ComplaintModel, QAfterSortBy>
       thenByRaisedByUserId() {
     return QueryBuilder.apply(this, (query) {
@@ -1067,6 +1262,13 @@ extension ComplaintModelQueryWhereDistinct
     });
   }
 
+  QueryBuilder<ComplaintModel, ComplaintModel, QDistinct> distinctByPhotoPath(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'photoPath', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<ComplaintModel, ComplaintModel, QDistinct>
       distinctByRaisedByUserId() {
     return QueryBuilder.apply(this, (query) {
@@ -1119,6 +1321,12 @@ extension ComplaintModelQueryProperty
   QueryBuilder<ComplaintModel, String, QQueryOperations> descriptionProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'description');
+    });
+  }
+
+  QueryBuilder<ComplaintModel, String?, QQueryOperations> photoPathProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'photoPath');
     });
   }
 

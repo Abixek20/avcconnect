@@ -7,10 +7,27 @@ import '../../../data/models/student_model.dart';
 import '../../../data/services/database_service.dart';
 import '../../auth/controllers/auth_controller.dart';
 
+/// Per-subject attendance summary shown in the Attendance tab.
+class SubjectAttendanceSummary {
+  final ClassSlotModel slot;
+  int present;
+  int absent;
+
+  SubjectAttendanceSummary({
+    required this.slot,
+    this.present = 0,
+    this.absent = 0,
+  });
+
+  int get total => present + absent;
+  double get percent => total == 0 ? 0 : (present / total) * 100;
+}
+
 class TimetableController extends GetxController {
   final RxList<ClassSlotModel> todaysSlots = <ClassSlotModel>[].obs;
   final RxMap<WeekDay, List<ClassSlotModel>> weekSlots = <WeekDay, List<ClassSlotModel>>{}.obs;
   final RxDouble attendancePercent = 0.0.obs;
+  final RxList<SubjectAttendanceSummary> subjectStats = <SubjectAttendanceSummary>[].obs;
   final RxBool isLoading = true.obs;
 
   StudentModel? _studentProfile;
@@ -46,6 +63,7 @@ class TimetableController extends GetxController {
         .sectionEqualTo(_studentProfile!.section)
         .findAll();
 
+    // Group by day
     final grouped = <WeekDay, List<ClassSlotModel>>{};
     for (final slot in slots) {
       grouped.putIfAbsent(slot.day, () => []).add(slot);
@@ -58,12 +76,12 @@ class TimetableController extends GetxController {
     final today = WeekDay.values[DateTime.now().weekday - 1 < 6 ? DateTime.now().weekday - 1 : 0];
     todaysSlots.value = grouped[today] ?? [];
 
-    await _computeAttendance(isar);
+    await _computeAttendance(isar, slots);
 
     isLoading.value = false;
   }
 
-  Future<void> _computeAttendance(Isar isar) async {
+  Future<void> _computeAttendance(Isar isar, List<ClassSlotModel> slots) async {
     if (_studentProfile == null) return;
 
     final records = await isar.attendanceModels
@@ -73,10 +91,36 @@ class TimetableController extends GetxController {
 
     if (records.isEmpty) {
       attendancePercent.value = 0;
+      subjectStats.value = [];
       return;
     }
 
     final present = records.where((r) => r.status == AttendanceStatus.present).length;
     attendancePercent.value = (present / records.length) * 100;
+
+    // Build per-subject summary
+    final slotMap = {for (final s in slots) s.id: s};
+    final statsMap = <int, SubjectAttendanceSummary>{};
+
+    for (final r in records) {
+      final slot = slotMap[r.classSlotId];
+      if (slot == null) continue;
+      statsMap.putIfAbsent(
+        slot.id,
+        () => SubjectAttendanceSummary(slot: slot),
+      );
+      if (r.status == AttendanceStatus.present) {
+        statsMap[slot.id]!.present++;
+      } else {
+        statsMap[slot.id]!.absent++;
+      }
+    }
+
+    // Sort by subject name
+    final list = statsMap.values.toList()
+      ..sort((a, b) => a.slot.subjectName.compareTo(b.slot.subjectName));
+    subjectStats.value = list;
   }
+
+  Future<void> reloadData() => _load();
 }

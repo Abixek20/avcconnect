@@ -5,7 +5,7 @@ import 'core/theme/app_theme.dart';
 import 'data/services/database_service.dart';
 import 'data/services/seed_service.dart';
 import 'modules/auth/controllers/auth_controller.dart';
-import 'modules/auth/views/auth_gate.dart';
+import 'modules/splash/views/splash_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +27,7 @@ class AVConnectApp extends StatelessWidget {
       title: 'AVConnect',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      home: const AuthGate(),
+      home: const SplashView(),
     );
   }
 }

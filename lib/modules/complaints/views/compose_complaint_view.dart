@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -64,13 +66,59 @@ class _ComposeComplaintViewState extends State<ComposeComplaintView> {
           const SizedBox(height: 20),
           TextField(
             controller: _descriptionCtrl,
-            maxLines: 6,
+            maxLines: 5,
             decoration: const InputDecoration(
               labelText: 'Describe the issue',
               alignLabelWithHint: true,
             ),
           ),
           const SizedBox(height: 20),
+
+          // Photo attachment section
+          const Text('Attachment (Optional)', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+          const SizedBox(height: 8),
+          Obx(() {
+            final path = controller.photoPath.value;
+            if (path == null) {
+              return OutlinedButton.icon(
+                onPressed: controller.pickPhoto,
+                icon: const Icon(Icons.add_a_photo_outlined, size: 18),
+                label: const Text('Attach Photo / Screenshot'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              );
+            }
+            return Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.file(
+                    File(path),
+                    height: 180,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: CircleAvatar(
+                    backgroundColor: Colors.black.withOpacity(0.6),
+                    radius: 16,
+                    child: IconButton(
+                      icon: const Icon(Icons.close, size: 16, color: Colors.white),
+                      onPressed: controller.removePhoto,
+                      padding: EdgeInsets.zero,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }),
+          const SizedBox(height: 24),
+
           Obx(() {
             final error = controller.errorMessage.value;
             if (error == null) return const SizedBox.shrink();

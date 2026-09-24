@@ -17,12 +17,13 @@ import '../models/subject_grade_model.dart';
 import '../models/placement_offer_model.dart';
 import '../models/semester_record_model.dart';
 import '../models/placement_training_model.dart';
+import '../models/fee_model.dart';
+import '../models/academic_event_model.dart';
+import '../models/exam_schedule_model.dart';
+import '../models/leave_application_model.dart';
+import '../models/book_model.dart';
+import '../models/issued_book_model.dart';
 
-/// Single Isar instance for the whole app. Since AVConnect is a demo with
-/// mock/seeded data (not per-user isolated like ITS Expense Tracker), one
-/// shared instance is enough. If real multi-account isolation is ever
-/// needed, switch to named instances keyed by user email (see ITS Expense
-/// Tracker's DatabaseService for that pattern).
 class DatabaseService {
   static Isar? _isar;
 
@@ -58,6 +59,12 @@ class DatabaseService {
         CoCurricularModelSchema,
         AdvisorMeetingLogModelSchema,
         PlacementOfferModelSchema,
+        FeeModelSchema,
+        AcademicEventModelSchema,
+        ExamScheduleModelSchema,
+        LeaveApplicationModelSchema,
+        BookModelSchema,
+        IssuedBookModelSchema,
       ],
       directory: dir.path,
       name: 'avconnect_db',

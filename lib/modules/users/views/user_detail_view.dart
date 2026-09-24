@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/faculty_model.dart';
 import '../../../data/models/student_model.dart';
 import '../../../data/models/user_model.dart';
 import '../../../data/services/database_service.dart';
+import '../../auth/controllers/auth_controller.dart';
+import '../../counselling/views/counselling_record_view.dart';
 
 class UserDetailView extends StatelessWidget {
   final UserModel user;
@@ -66,6 +69,25 @@ class UserDetailView extends StatelessWidget {
                   extras.student!.hostelBlock == null
                       ? 'Day Scholar'
                       : '${extras.student!.hostelBlock} • Room ${extras.student!.roomNumber ?? '-'}',
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.navy,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size.fromHeight(48),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  icon: const Icon(Icons.badge_outlined),
+                  label: const Text('View Counselling Record'),
+                  onPressed: () {
+                    final currentUser = AuthController.to.currentUser.value;
+                    final isFacultyOrAdmin = currentUser?.role == UserRole.faculty || currentUser?.role == UserRole.admin;
+                    Get.to(() => CounsellingRecordView(
+                          studentProfileId: extras.student!.id,
+                          canEdit: isFacultyOrAdmin,
+                        ));
+                  },
                 ),
               ],
               if (extras.faculty != null) ...[

@@ -5,10 +5,13 @@ import '../../../data/services/database_service.dart';
 import '../../auth/controllers/auth_controller.dart';
 
 class ComposeNoticeController extends GetxController {
+  final RxString category = 'General'.obs;
   final RxnString departmentFilter = RxnString();
   final RxnInt yearFilter = RxnInt();
   final RxBool isPosting = false.obs;
   final RxnString errorMessage = RxnString();
+
+  static const categories = ['Academic', 'Exam', 'Event', 'General'];
 
   static const departments = [
     'AIDS', 'CE', 'CSE', 'EEE', 'ECE', 'IT', 'ICE', 'ME', 'BA', 'CA', 'SH',
@@ -29,6 +32,8 @@ class ComposeNoticeController extends GetxController {
     final notice = NoticeModel()
       ..title = title.trim()
       ..body = body.trim()
+      ..category = category.value
+      ..isRead = false
       ..postedByUserId = user?.id ?? 0
       ..postedAt = DateTime.now()
       ..departmentFilter = departmentFilter.value

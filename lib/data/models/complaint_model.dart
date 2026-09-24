@@ -16,6 +16,7 @@ class ComplaintModel {
   late ComplaintCategory category;
 
   late String description;
+  String? photoPath;
 
   @enumerated
   late ComplaintStatus status;

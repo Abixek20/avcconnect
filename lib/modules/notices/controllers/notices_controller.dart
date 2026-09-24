@@ -8,8 +8,14 @@ import '../../../data/services/database_service.dart';
 import '../../auth/controllers/auth_controller.dart';
 
 class NoticesController extends GetxController {
-  final RxList<NoticeModel> notices = <NoticeModel>[].obs;
+  final RxList<NoticeModel> allNotices = <NoticeModel>[].obs;
+  final RxList<NoticeModel> filteredNotices = <NoticeModel>[].obs;
+
   final RxBool isLoading = true.obs;
+  final RxString selectedCategory = 'All'.obs;
+  final RxString searchQuery = ''.obs;
+
+  int get unreadCount => allNotices.where((n) => !n.isRead).length;
 
   @override
   void onInit() {
@@ -24,29 +30,61 @@ class NoticesController extends GetxController {
 
     final user = AuthController.to.currentUser.value;
 
-    // Non-students (faculty/admin) see everything. Students only see notices
-    // targeted at their department/year, or campus-wide notices (null filters).
+    List<NoticeModel> userNotices = [];
     if (user == null || user.role != UserRole.student || user.studentProfileId == null) {
-      notices.value = all;
-      isLoading.value = false;
-      return;
+      userNotices = all;
+    } else {
+      final StudentModel? profile = await isar.studentModels.get(user.studentProfileId!);
+      if (profile == null) {
+        userNotices = all;
+      } else {
+        userNotices = all.where((n) {
+          final deptMatches = n.departmentFilter == null || n.departmentFilter == profile.department;
+          final yearMatches = n.yearFilter == null || n.yearFilter == profile.yearOfStudy;
+          return deptMatches && yearMatches;
+        }).toList();
+      }
     }
 
-    final StudentModel? profile = await isar.studentModels.get(user.studentProfileId!);
-    if (profile == null) {
-      notices.value = all;
-      isLoading.value = false;
-      return;
-    }
-
-    notices.value = all.where((n) {
-      final deptMatches = n.departmentFilter == null || n.departmentFilter == profile.department;
-      final yearMatches = n.yearFilter == null || n.yearFilter == profile.yearOfStudy;
-      return deptMatches && yearMatches;
-    }).toList();
-
+    allNotices.value = userNotices;
+    _applyFilters();
     isLoading.value = false;
   }
 
-  Future<void> refresh() => _load();
+  void setCategory(String category) {
+    selectedCategory.value = category;
+    _applyFilters();
+  }
+
+  void setSearchQuery(String query) {
+    searchQuery.value = query;
+    _applyFilters();
+  }
+
+  void _applyFilters() {
+    var result = List<NoticeModel>.from(allNotices);
+
+    if (selectedCategory.value != 'All') {
+      result = result.where((n) => (n.category ?? 'General').toLowerCase() == selectedCategory.value.toLowerCase()).toList();
+    }
+
+    if (searchQuery.value.isNotEmpty) {
+      final q = searchQuery.value.toLowerCase();
+      result = result.where((n) => n.title.toLowerCase().contains(q) || n.body.toLowerCase().contains(q)).toList();
+    }
+
+    filteredNotices.value = result;
+  }
+
+  Future<void> toggleReadStatus(NoticeModel notice) async {
+    final isar = DatabaseService.instance;
+    await isar.writeTxn(() async {
+      notice.isRead = !notice.isRead;
+      await isar.noticeModels.put(notice);
+    });
+    allNotices.refresh();
+    _applyFilters();
+  }
+
+  Future<void> refreshNotices() => _load();
 }

@@ -13,6 +13,9 @@ class NoticeModel {
   @Index()
   late DateTime postedAt;
 
+  String? category; // 'Academic', 'Exam', 'Event', 'General'
+  bool isRead = false;
+
   String? departmentFilter; // null = visible to all departments
   int? yearFilter; // null = visible to all years
 }

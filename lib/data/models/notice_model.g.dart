@@ -22,28 +22,38 @@ const NoticeModelSchema = CollectionSchema(
       name: r'body',
       type: IsarType.string,
     ),
-    r'departmentFilter': PropertySchema(
+    r'category': PropertySchema(
       id: 1,
+      name: r'category',
+      type: IsarType.string,
+    ),
+    r'departmentFilter': PropertySchema(
+      id: 2,
       name: r'departmentFilter',
       type: IsarType.string,
     ),
+    r'isRead': PropertySchema(
+      id: 3,
+      name: r'isRead',
+      type: IsarType.bool,
+    ),
     r'postedAt': PropertySchema(
-      id: 2,
+      id: 4,
       name: r'postedAt',
       type: IsarType.dateTime,
     ),
     r'postedByUserId': PropertySchema(
-      id: 3,
+      id: 5,
       name: r'postedByUserId',
       type: IsarType.long,
     ),
     r'title': PropertySchema(
-      id: 4,
+      id: 6,
       name: r'title',
       type: IsarType.string,
     ),
     r'yearFilter': PropertySchema(
-      id: 5,
+      id: 7,
       name: r'yearFilter',
       type: IsarType.long,
     )
@@ -84,6 +94,12 @@ int _noticeModelEstimateSize(
   var bytesCount = offsets.last;
   bytesCount += 3 + object.body.length * 3;
   {
+    final value = object.category;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
     final value = object.departmentFilter;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
@@ -100,11 +116,13 @@ void _noticeModelSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeString(offsets[0], object.body);
-  writer.writeString(offsets[1], object.departmentFilter);
-  writer.writeDateTime(offsets[2], object.postedAt);
-  writer.writeLong(offsets[3], object.postedByUserId);
-  writer.writeString(offsets[4], object.title);
-  writer.writeLong(offsets[5], object.yearFilter);
+  writer.writeString(offsets[1], object.category);
+  writer.writeString(offsets[2], object.departmentFilter);
+  writer.writeBool(offsets[3], object.isRead);
+  writer.writeDateTime(offsets[4], object.postedAt);
+  writer.writeLong(offsets[5], object.postedByUserId);
+  writer.writeString(offsets[6], object.title);
+  writer.writeLong(offsets[7], object.yearFilter);
 }
 
 NoticeModel _noticeModelDeserialize(
@@ -115,12 +133,14 @@ NoticeModel _noticeModelDeserialize(
 ) {
   final object = NoticeModel();
   object.body = reader.readString(offsets[0]);
-  object.departmentFilter = reader.readStringOrNull(offsets[1]);
+  object.category = reader.readStringOrNull(offsets[1]);
+  object.departmentFilter = reader.readStringOrNull(offsets[2]);
   object.id = id;
-  object.postedAt = reader.readDateTime(offsets[2]);
-  object.postedByUserId = reader.readLong(offsets[3]);
-  object.title = reader.readString(offsets[4]);
-  object.yearFilter = reader.readLongOrNull(offsets[5]);
+  object.isRead = reader.readBool(offsets[3]);
+  object.postedAt = reader.readDateTime(offsets[4]);
+  object.postedByUserId = reader.readLong(offsets[5]);
+  object.title = reader.readString(offsets[6]);
+  object.yearFilter = reader.readLongOrNull(offsets[7]);
   return object;
 }
 
@@ -136,12 +156,16 @@ P _noticeModelDeserializeProp<P>(
     case 1:
       return (reader.readStringOrNull(offset)) as P;
     case 2:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 3:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 4:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTime(offset)) as P;
     case 5:
+      return (reader.readLong(offset)) as P;
+    case 6:
+      return (reader.readString(offset)) as P;
+    case 7:
       return (reader.readLongOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -471,6 +495,159 @@ extension NoticeModelQueryFilter
   }
 
   QueryBuilder<NoticeModel, NoticeModel, QAfterFilterCondition>
+      categoryIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'category',
+      ));
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QAfterFilterCondition>
+      categoryIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'category',
+      ));
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QAfterFilterCondition> categoryEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'category',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QAfterFilterCondition>
+      categoryGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'category',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QAfterFilterCondition>
+      categoryLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'category',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QAfterFilterCondition> categoryBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'category',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QAfterFilterCondition>
+      categoryStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'category',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QAfterFilterCondition>
+      categoryEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'category',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QAfterFilterCondition>
+      categoryContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'category',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QAfterFilterCondition> categoryMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'category',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QAfterFilterCondition>
+      categoryIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'category',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QAfterFilterCondition>
+      categoryIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'category',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QAfterFilterCondition>
       departmentFilterIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -673,6 +850,16 @@ extension NoticeModelQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QAfterFilterCondition> isReadEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isRead',
+        value: value,
       ));
     });
   }
@@ -1015,6 +1202,18 @@ extension NoticeModelQuerySortBy
     });
   }
 
+  QueryBuilder<NoticeModel, NoticeModel, QAfterSortBy> sortByCategory() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'category', Sort.asc);
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QAfterSortBy> sortByCategoryDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'category', Sort.desc);
+    });
+  }
+
   QueryBuilder<NoticeModel, NoticeModel, QAfterSortBy>
       sortByDepartmentFilter() {
     return QueryBuilder.apply(this, (query) {
@@ -1026,6 +1225,18 @@ extension NoticeModelQuerySortBy
       sortByDepartmentFilterDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'departmentFilter', Sort.desc);
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QAfterSortBy> sortByIsRead() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isRead', Sort.asc);
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QAfterSortBy> sortByIsReadDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isRead', Sort.desc);
     });
   }
 
@@ -1093,6 +1304,18 @@ extension NoticeModelQuerySortThenBy
     });
   }
 
+  QueryBuilder<NoticeModel, NoticeModel, QAfterSortBy> thenByCategory() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'category', Sort.asc);
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QAfterSortBy> thenByCategoryDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'category', Sort.desc);
+    });
+  }
+
   QueryBuilder<NoticeModel, NoticeModel, QAfterSortBy>
       thenByDepartmentFilter() {
     return QueryBuilder.apply(this, (query) {
@@ -1116,6 +1339,18 @@ extension NoticeModelQuerySortThenBy
   QueryBuilder<NoticeModel, NoticeModel, QAfterSortBy> thenByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QAfterSortBy> thenByIsRead() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isRead', Sort.asc);
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QAfterSortBy> thenByIsReadDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isRead', Sort.desc);
     });
   }
 
@@ -1178,11 +1413,24 @@ extension NoticeModelQueryWhereDistinct
     });
   }
 
+  QueryBuilder<NoticeModel, NoticeModel, QDistinct> distinctByCategory(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'category', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<NoticeModel, NoticeModel, QDistinct> distinctByDepartmentFilter(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'departmentFilter',
           caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<NoticeModel, NoticeModel, QDistinct> distinctByIsRead() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isRead');
     });
   }
 
@@ -1226,10 +1474,22 @@ extension NoticeModelQueryProperty
     });
   }
 
+  QueryBuilder<NoticeModel, String?, QQueryOperations> categoryProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'category');
+    });
+  }
+
   QueryBuilder<NoticeModel, String?, QQueryOperations>
       departmentFilterProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'departmentFilter');
+    });
+  }
+
+  QueryBuilder<NoticeModel, bool, QQueryOperations> isReadProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isRead');
     });
   }
 
